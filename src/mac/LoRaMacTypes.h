@@ -35,6 +35,11 @@
 #ifndef __LORAMAC_TYPES_H__
 #define __LORAMAC_TYPES_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "timer.h"
@@ -327,6 +332,11 @@ typedef union uMcRxParams
 typedef struct sMcChannelParams
 {
     /*!
+     * Indicate if the multicast channel is being setup remotely or locally.
+     * Indicates which set of keys are to be used. \ref uMcKeys
+     */
+    bool IsRemotelySetup;
+    /*!
      * Multicats channel LoRaWAN class B or C
      */
     DeviceClass_t Class;
@@ -343,9 +353,30 @@ typedef struct sMcChannelParams
      */
     uint32_t Address;
     /*!
-     * Encrypted multicast key
+     * Multicast keys
      */
-    uint8_t *McKeyE;
+    union uMcKeys
+    {
+        /*!
+         * Encrypted multicast key - Used when IsRemotelySetup equals `true`.
+         * MC_KEY is decrypted and then the session keys ar derived.
+         */
+        uint8_t *McKeyE;
+        /*!
+         * Multicast Session keys - Used when IsRemotelySetup equals `false`
+         */
+        struct
+        {
+            /*!
+             * Multicast application session key
+             */
+            uint8_t *McAppSKey;
+            /*!
+             * Multicast network session key
+             */
+            uint8_t *McNwkSKey;
+        };
+    }McKeys;
     /*!
      * Minimum multicast frame counter value
      */
@@ -638,6 +669,10 @@ typedef enum eLoRaMacBatteryLevel
      */
     BAT_LEVEL_NO_MEASURE             = 0xFF,
 }LoRaMacBatteryLevel_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LORAMAC_TYPES_H__
 

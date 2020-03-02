@@ -52,6 +52,11 @@
 #ifndef __REGION_H__
 #define __REGION_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "utilities.h"
@@ -62,6 +67,13 @@
  * Macro to compute bit of a channel index.
  */
 #define LC( channelIndex )                          ( uint16_t )( 1 << ( channelIndex - 1 ) )
+
+#ifndef REGION_VERSION
+/*!
+ * Regional parameters version definition.
+ */
+#define REGION_VERSION                              0x00010003
+#endif
 
 /*!
  * Region       | SF
@@ -804,6 +816,10 @@ typedef enum ePhyAttribute
 typedef enum eInitType
 {
     /*!
+     * Initializes the band definitions.
+     */
+    INIT_TYPE_BANDS,
+    /*!
      * Initializes the region specific data to defaults, according to the
      * LoRaWAN specification.
      */
@@ -1280,6 +1296,11 @@ typedef struct sNextChanParams
      * Set to true, if the duty cycle is enabled, otherwise false.
      */
     bool DutyCycleEnabled;
+    /*!
+     * Set to true, if the function shall only provide the time
+     * for the next transmission.
+     */
+    bool QueryNextTxDelayOnly;
 }NextChanParams_t;
 
 /*!
@@ -1683,6 +1704,17 @@ uint8_t RegionApplyDrOffset( LoRaMacRegion_t region, uint8_t downlinkDwellTime, 
  */
 void RegionRxBeaconSetup( LoRaMacRegion_t region, RxBeaconSetup_t* rxBeaconSetup, uint8_t* outDr );
 
+/*!
+ * \brief Gets the version of the regional parameters implementation.
+ *
+ * \retval Version of the regional parameters.
+ */
+Version_t RegionGetVersion( void );
+
 /*! \} defgroup REGION */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __REGION_H__

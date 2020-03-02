@@ -37,6 +37,11 @@
 #ifndef __REGION_AU915_H__
 #define __REGION_AU915_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include "region/Region.h"
 
 /*!
@@ -226,7 +231,7 @@
 /*!
  * Datarate of the beacon channel
  */
-#define AU915_BEACON_CHANNEL_DR                     DR_10
+#define AU915_BEACON_CHANNEL_DR                     DR_8
 
 /*!
  * Bandwith of the beacon channel
@@ -236,7 +241,7 @@
 /*!
  * Ping slot channel datarate
  */
-#define AU915_PING_SLOT_CHANNEL_DR                  DR_10
+#define AU915_PING_SLOT_CHANNEL_DR                  DR_8
 
 /*!
  * LoRaMac maximum number of bands
@@ -536,5 +541,9 @@ uint8_t RegionAU915ApplyDrOffset( uint8_t downlinkDwellTime, int8_t dr, int8_t d
  void RegionAU915RxBeaconSetup( RxBeaconSetup_t* rxBeaconSetup, uint8_t* outDr );
 
 /*! \} defgroup REGIONAU915 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __REGION_AU915_H__

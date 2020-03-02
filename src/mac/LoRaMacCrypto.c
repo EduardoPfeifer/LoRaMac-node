@@ -52,11 +52,6 @@
 #define USE_RANDOM_DEV_NONCE                        1
 
 /*
- * Initial value of the frame counters
- */
-#define FCNT_DOWN_INITAL_VALUE          0xFFFFFFFF
-
-/*
  * Frame direction definition for uplink communications
  */
 #define UPLINK                          0
@@ -958,8 +953,8 @@ LoRaMacCryptoStatus_t LoRaMacCryptoInit( LoRaMacCryptoNvmEvent cryptoNvmCtxChang
     // Set default LoRaWAN version
     CryptoCtx.NvmCtx->LrWanVersion.Fields.Major = 1;
     CryptoCtx.NvmCtx->LrWanVersion.Fields.Minor = 1;
-    CryptoCtx.NvmCtx->LrWanVersion.Fields.Revision = 1;
-    CryptoCtx.NvmCtx->LrWanVersion.Fields.Rfu = 0;
+    CryptoCtx.NvmCtx->LrWanVersion.Fields.Patch = 1;
+    CryptoCtx.NvmCtx->LrWanVersion.Fields.Revision = 0;
 
     // Reset frame counters
     ResetFCnts( );

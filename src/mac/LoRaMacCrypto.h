@@ -37,12 +37,22 @@
 #ifndef __LORAMAC_CRYPTO_H__
 #define __LORAMAC_CRYPTO_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "utilities.h"
 #include "LoRaMacTypes.h"
 #include "LoRaMacMessageTypes.h"
+
+/*
+ * Initial value of the frame counters
+ */
+#define FCNT_DOWN_INITAL_VALUE          0xFFFFFFFF
 
 /*!
  * LoRaMac Cryto Status
@@ -151,7 +161,7 @@ LoRaMacCryptoStatus_t LoRaMacCryptoInit( LoRaMacCryptoNvmEvent cryptoNvmCtxChang
 
 /*!
  * Sets the LoRaWAN specification version to be used.
- * 
+ *
  * \warning This function should be used for ABP only. In case of OTA the version will be set automatically.
  *
  * \param[IN]     version             - LoRaWAN specification version to be used.
@@ -311,5 +321,9 @@ LoRaMacCryptoStatus_t LoRaMacCryptoDeriveMcKEKey( KeyIdentifier_t keyID );
 LoRaMacCryptoStatus_t LoRaMacCryptoDeriveMcSessionKeyPair( AddressIdentifier_t addrID, uint32_t mcAddr );
 
 /*! \} addtogroup LORAMAC */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LORAMAC_CRYPTO_H__

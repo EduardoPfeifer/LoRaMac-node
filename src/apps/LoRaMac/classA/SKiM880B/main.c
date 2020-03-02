@@ -341,6 +341,12 @@ static void JoinNetwork( void )
     }
     else
     {
+        if( status == LORAMAC_STATUS_DUTYCYCLE_RESTRICTED )
+        {
+            TimerTime_t nextTxIn = 0;
+            LoRaMacQueryNextTxDelay( LORAWAN_DEFAULT_DATARATE, &nextTxIn );
+            printf( "Next Tx in  : ~%lu second(s)\r\n", ( nextTxIn / 1000 ) );
+        }
         DeviceState = DEVICE_STATE_CYCLE;
     }
 }
@@ -450,6 +456,13 @@ static bool SendFrame( void )
     status = LoRaMacMcpsRequest( &mcpsReq );
     printf( "\r\n###### ===== MCPS-Request ==== ######\r\n" );
     printf( "STATUS      : %s\r\n", MacStatusStrings[status] );
+
+    if( status == LORAMAC_STATUS_DUTYCYCLE_RESTRICTED )
+    {
+        TimerTime_t nextTxIn = 0;
+        LoRaMacQueryNextTxDelay( LORAWAN_DEFAULT_DATARATE, &nextTxIn );
+        printf( "Next Tx in  : ~%lu second(s)\r\n", ( nextTxIn / 1000 ) );
+    }
 
     if( status == LORAMAC_STATUS_OK )
     {
@@ -974,11 +987,19 @@ int main( void )
     macCallbacks.NvmContextChange = NvmCtxMgmtEvent;
     macCallbacks.MacProcessNotify = OnMacProcessNotify;
 
-    LoRaMacInitialization( &macPrimitives, &macCallbacks, ACTIVE_REGION );
+    status = LoRaMacInitialization( &macPrimitives, &macCallbacks, ACTIVE_REGION );
+    if ( status != LORAMAC_STATUS_OK )
+    {
+        printf( "LoRaMac wasn't properly initialized, error: %s", MacStatusStrings[status] );
+        // Fatal error, endless loop.
+        while ( 1 )
+        {
+        }
+    }
 
     DeviceState = DEVICE_STATE_RESTORE;
 
-    printf( "###### ===== ClassA demo application v1.0.RC1 ==== ######\r\n\r\n" );
+    printf( "###### ===== ClassA demo application v1.0.0 ==== ######\r\n\r\n" );
 
     while( 1 )
     {

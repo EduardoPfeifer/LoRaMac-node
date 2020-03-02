@@ -271,10 +271,7 @@ bool SX1276IsChannelFree( RadioModems_t modem, uint32_t freq, int16_t rssiThresh
     int16_t rssi = 0;
     uint32_t carrierSenseTime = 0;
 
-    if( SX1276GetStatus( ) != RF_IDLE )
-    {
-        return false;
-    }
+    SX1276SetSleep( );
 
     SX1276SetModem( modem );
 
@@ -708,7 +705,7 @@ uint32_t SX1276GetTimeOnAir( RadioModems_t modem, uint8_t pktLen )
     {
     case MODEM_FSK:
         {
-            airTime = round( ( 8 * ( SX1276.Settings.Fsk.PreambleLen +
+            airTime = ( uint32_t )round( ( 8 * ( SX1276.Settings.Fsk.PreambleLen +
                                      ( ( SX1276Read( REG_SYNCCONFIG ) & ~RF_SYNCCONFIG_SYNCSIZE_MASK ) + 1 ) +
                                      ( ( SX1276.Settings.Fsk.FixLen == 0x01 ) ? 0.0 : 1.0 ) +
                                      ( ( ( SX1276Read( REG_PACKETCONFIG1 ) & ~RF_PACKETCONFIG1_ADDRSFILTERING_MASK ) != 0x00 ) ? 1.0 : 0 ) +
@@ -772,7 +769,7 @@ uint32_t SX1276GetTimeOnAir( RadioModems_t modem, uint8_t pktLen )
             // Time on air
             double tOnAir = tPreamble + tPayload;
             // return ms secs
-            airTime = floor( tOnAir * 1000 + 0.999 );
+            airTime = ( uint32_t )floor( tOnAir * 1000 + 0.999 );
         }
         break;
     }
@@ -1389,10 +1386,12 @@ void SX1276OnTimeoutIrq( void* context )
         break;
     case RF_TX_RUNNING:
         // Tx timeout shouldn't happen.
-        // But it has been observed that when it happens it is a result of a corrupted SPI transfer
-        // it depends on the platform design.
-        //
-        // The workaround is to put the radio in a known state. Thus, we re-initialize it.
+        // Reported issue of SPI data corruption resulting in TX TIMEOUT 
+        // is NOT related to a bug in radio transceiver.
+        // It is mainly caused by improper PCB routing of SPI lines and/or
+        // violation of SPI specifications.
+        // To mitigate redesign, Semtech offers a workaround which resets
+        // the radio transceiver and putting it into a known state.
 
         // BEGIN WORKAROUND
 

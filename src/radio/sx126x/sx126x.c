@@ -227,18 +227,27 @@ void SX126xSetWhiteningSeed( uint16_t seed )
 
 uint32_t SX126xGetRandom( void )
 {
-    uint8_t buf[] = { 0, 0, 0, 0 };
+    uint32_t number = 0;
+    uint8_t regAnaLna = 0;
+    uint8_t regAnaMixer = 0;
+
+    regAnaLna = SX126xReadRegister( REG_ANA_LNA );
+    SX126xWriteRegister( REG_ANA_LNA, regAnaLna & ~( 1 << 0 ) );
+
+    regAnaMixer = SX126xReadRegister( REG_ANA_MIXER );
+    SX126xWriteRegister( REG_ANA_MIXER, regAnaMixer & ~( 1 << 7 ) );
 
     // Set radio in continuous reception
-    SX126xSetRx( 0 );
+    SX126xSetRx( 0xFFFFFF ); // Rx Continuous
 
-    DelayMs( 1 );
-
-    SX126xReadRegisters( RANDOM_NUMBER_GENERATORBASEADDR, buf, 4 );
+    SX126xReadRegisters( RANDOM_NUMBER_GENERATORBASEADDR, ( uint8_t* )&number, 4 );
 
     SX126xSetStandby( STDBY_RC );
 
-    return ( buf[0] << 24 ) | ( buf[1] << 16 ) | ( buf[2] << 8 ) | buf[3];
+    SX126xWriteRegister( REG_ANA_LNA, regAnaLna );
+    SX126xWriteRegister( REG_ANA_MIXER, regAnaMixer );
+
+    return number;
 }
 
 void SX126xSetSleep( SleepParams_t sleepConfig )

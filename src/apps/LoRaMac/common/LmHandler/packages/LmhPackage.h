@@ -102,15 +102,17 @@ typedef struct LmhPackage_s
      *
      * \param   [IN] status      - Request returned status
      * \param   [IN] mcpsRequest - Performed MCPS-Request. Refer to \ref McpsReq_t.
+     * \param   [IN] nextTxDelay - Time to wait until another TX is possible.
      */
-    void ( *OnMacMcpsRequest )( LoRaMacStatus_t status, McpsReq_t *mcpsReq );
+    void ( *OnMacMcpsRequest )( LoRaMacStatus_t status, McpsReq_t *mcpsReq, TimerTime_t nextTxDelay );
     /*!
      * Notifies the upper layer that a MLME request has been made to the MAC layer
      *
      * \param   [IN] status      - Request returned status
      * \param   [IN] mlmeRequest - Performed MLME-Request. Refer to \ref MlmeReq_t.
+     * \param   [IN] nextTxDelay - Time to wait until another TX is possible.
      */
-    void ( *OnMacMlmeRequest )( LoRaMacStatus_t status, MlmeReq_t *mlmeReq );
+    void ( *OnMacMlmeRequest )( LoRaMacStatus_t status, MlmeReq_t *mlmeReq, TimerTime_t nextTxDelay );
     /*!
     * Join a LoRa Network in classA
     *
@@ -135,10 +137,20 @@ typedef struct LmhPackage_s
     * \retval status Returns \ref LORAMAC_HANDLER_SET if joined else \ref LORAMAC_HANDLER_RESET
     */
     LmHandlerErrorStatus_t ( *OnDeviceTimeRequest )( void );
+#if( LMH_SYS_TIME_UPDATE_NEW_API == 1 )
+    /*!
+     * Notifies the upper layer that the system time has been updated.
+     *
+     * \param [in] isSynchronized Indicates if the system time is synchronized in the range +/-1 second
+     * \param [in] timeCorrection Received time correction value
+     */
+    void ( *OnSysTimeUpdate )( bool isSynchronized, int32_t timeCorrection );
+#else
     /*!
      * Notifies the upper layer that the system time has been updated.
      */
     void ( *OnSysTimeUpdate )( void );
+#endif
 }LmhPackage_t;
 
 #endif // __LMH_PACKAGE_H__
